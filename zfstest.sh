@@ -76,16 +76,15 @@ CORRUPTED=$?
 set -e
 if [ "$SUM_A" != "$SUM_B" ]
 then
-	echo "corrupted $CORRUPTED"
 	if [ $CORRUPTED -eq 0 ]
 	then
-		echo "${RED}the pool is silently corrupted${NC}"
+		echo "\n${RED}the pool is silently corrupted${NC}"
 		trap empty EXIT
 		exit 0
 	else
-		echo "${GREEN}zfs detected the corruption${NC}"
+		echo "\n${GREEN}zfs detected the corruption${NC}"
 	fi
 else
-	echo "no corruption in file"
+	echo "\nno corruption in file"
 fi
 
