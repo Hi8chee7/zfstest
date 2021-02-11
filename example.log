@@ -1,0 +1,20 @@
+# sh ./zfstest.sh /dev/sdc1
+837b0910bd47c4dfb20d36b759beb4a73edc4a93  /zfstest/testfile		<- hash of the non-corrupted file
+	  sdc1      ONLINE       0     0     0
+zfs detected no corruption
+corrupting filesystem
+trying to read a file from corrupted filesysten with shasum
+c438d4b86c613d56547f95cc9f4478c1c7dd6b4d  /zfstest/testfile		<- hash of the corrupted file (eventually shasum gets a read error but does not evaluate it)
+	  sdc1      ONLINE       0     0     0						<- zfs does not show any errors
+zfs detected no corruption
+
+the pool is silently corrupted
+
+# zpool status zfstest | grep sdc1
+	  sdc1      ONLINE       0     0     0						<- a manual invocation of zpool status a few seconds later still shows no errors
+
+# shasum /zfstest/testfile 
+c438d4b86c613d56547f95cc9f4478c1c7dd6b4d  /zfstest/testfile		<- hash still is the same as the corrupted above
+
+# zpool status zfstest | grep sdc1
+	  sdc1      ONLINE       0     0     1						<- finally zfs reports the error
