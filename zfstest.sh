@@ -16,7 +16,7 @@ destroypool () {
 
 print_corruption () {
 	sleep 1
-	zpool status zfstest
+	zpool status zfstest | grep $(basename -- "$ZFSDEVICE")
 	zpool status zfstest | grep -i corruption > /dev/null
 	if [ $? -eq 0 ]
 	then
