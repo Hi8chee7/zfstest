@@ -1,0 +1,12 @@
+Usage: zfstest.sh devicename
+Where devicename should be a blockdevice of 1GB.
+The script roughly does the following steps:
+- create a zfs filesystem in the blockdevice
+- create a 800MB file in this filesystem containing zeroes
+- shasum this file
+- change a single byte in the blockdevice
+- flush caches
+- shasum again (the checksum sometimes differs from the first one indicating a file corruption, this might be a bug in shasum that needs investigation)
+- check the output of zpool status (even if the above checksums differ, zfs does not reliably show an error)
+
+You might need to run this script multiple times to trigger the issue. If the error is triggered it prints "the pool is silently corrupted" in red letters.
