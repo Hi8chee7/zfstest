@@ -33,7 +33,6 @@ empty () {
 	sleep 0
 }
 
-
 if [ "$#" -ne 1 ]
 then
 	echo "Usage: $0 device"
@@ -45,6 +44,9 @@ RED='\033[0;31m'
 GREEN='\033[0;32m'
 NC='\033[0m'
 
+#CMD_SHASUM="shasum /zfstest/testfile"
+CMD_SHASUM="dd status=none if=/zfstest/testfile bs=8192 | shasum"
+
 set -e
 modprobe -v zfs
 if [ ! -b "$ZFSDEVICE" ]
@@ -52,11 +54,10 @@ then
 	truncate -s 1G $ZFSDEVICE
 fi
 trap deleteimage EXIT
-#set -o xtrace
 zpool create -f -m /zfstest zfstest `readlink -f $ZFSDEVICE`
 trap destroypool EXIT
 dd if=/dev/zero of=/zfstest/testfile bs=1M count=800 2> /dev/null
-SUM_A=`shasum /zfstest/testfile`
+SUM_A=`eval $CMD_SHASUM`
 echo "$SUM_A"
 set +e
 print_corruption
@@ -69,7 +70,7 @@ echo 3 > /proc/sys/vm/drop_caches
 
 echo "trying to read a file from corrupted filesysten with shasum"
 set +e
-SUM_B=`shasum /zfstest/testfile`
+SUM_B=`eval $CMD_SHASUM`
 echo "$SUM_B"
 print_corruption
 CORRUPTED=$?
